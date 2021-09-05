@@ -28,7 +28,7 @@ model_name = "PGM-XCeption-1.0"  # The name to tore checkpoint
 save_frequency = 50  # The number of intervals between storage of checkpoints
 continue_training = True  # Whether to find & use pre-training checkpoint
 
-root_dir = '/home/lingfeimo/cz/Dataset/men/t_shirt'  # Path to preprocessed dataset
+root_dir = '/home/lingfeimo/cz/Dataset/adidas/men/t_shirt'  # Path to preprocessed dataset
 # root_dir = '/Users/fredrichie/Desktop/dataset/adidas_pre/men/test'
 G_dir = './checkpoints/%s.pth' % model_name  # Path to pre-trained Generator checkpoint
 
