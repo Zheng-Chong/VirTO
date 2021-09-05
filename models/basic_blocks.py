@@ -2,6 +2,7 @@ import torch.nn as nn
 import torch
 
 
+# CBAM Block (to add attention)
 class CBAM(nn.Module):
     def __init__(self, in_planes, ratio=16, kernel_size=7):
         super(CBAM, self).__init__()
@@ -55,6 +56,44 @@ class SeparableConv(nn.Module):
     def forward(self, input):
         out = self.depth_conv(input)
         out = self.point_conv(out)
+        return out
+
+
+# Basic Block for ResNet based Network
+class ResnetBlock(nn.Module):
+    def __init__(self, in_channels, out_channels, conv_num=3, separable_conv=False, cbam=False,
+                 pre_relu=True, max_pool=False, diy=None, skip=True, upsanmple=False):
+        super(ResnetBlock, self).__init__()
+        self.skip = skip
+        blocks = []
+        in_cs = [in_channels] + [out_channels] * (conv_num-1) if diy is None else diy
+        for i in in_cs:
+            conv_layer = SeparableConv(i, out_channels) if separable_conv else nn.Conv2d(i, out_channels, kernel_size=3, padding=1)
+            blocks += [nn.ReLU(),
+                       conv_layer,
+                       nn.BatchNorm2d(out_channels)]
+        if not pre_relu:
+            blocks.pop(0)
+        if max_pool:
+            blocks += [nn.MaxPool2d(kernel_size=3, stride=2, padding=1)]
+        if cbam:
+            blocks += [CBAM(out_channels)]
+        if upsanmple:
+            blocks += [nn.ReLU(),
+                       nn.ConvTranspose2d(out_channels, out_channels // 2, kernel_size=2, stride=2),
+                       nn.BatchNorm2d(out_channels // 2)
+                       ]
+
+        self.block = nn.Sequential(*blocks)
+        # Resident Connections
+        self.resConnection = nn.Conv2d(in_channels, out_channels, kernel_size=1, stride=2) if max_pool \
+            else nn.Conv2d(in_channels, out_channels, kernel_size=1)
+
+    def forward(self, x):
+        a = self.block(x)
+        b = self.resConnection(x)
+        # print(a.size(), b.size())
+        out = self.block(x) + self.resConnection(x) if self.skip else self.block(x)
         return out
 
 
