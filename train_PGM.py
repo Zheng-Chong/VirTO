@@ -37,7 +37,7 @@ def train(model_name='default', epoch_num=500, save_frequency=100, patch_size=12
     # Initial dataset
     dataset = dataset_loader.PGMDataset(root_dir)
     # Setup Cloth Parsing Module Network
-    G, start_epoch = networks.PGMGenerator(code_channels=1024), 0
+    G, start_epoch = networks.PGMGenerator(), 0
     if os.path.isfile(G_dir) and continue_training:
         print("Load state dict from %s ...." % G_dir)
         start_epoch = torch.load(G_dir, map_location=device)['epoch']
