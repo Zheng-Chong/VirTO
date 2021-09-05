@@ -1,5 +1,6 @@
 import torch.nn as nn
 import torch
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 # CBAM Block (to add attention)
@@ -84,7 +85,7 @@ class ResnetBlock(nn.Module):
                        nn.BatchNorm2d(out_channels // 2)
                        ]
 
-        self.block = nn.Sequential(*blocks)
+        self.block = nn.Sequential(*blocks).to(device)
         # Resident Connections
         self.resConnection = nn.Conv2d(in_channels, out_channels, kernel_size=1, stride=2) if max_pool \
             else nn.Conv2d(in_channels, out_channels, kernel_size=1)
@@ -94,51 +95,6 @@ class ResnetBlock(nn.Module):
         return out
 
 
-# Convolutional layer with l2 weight normalization and learned scaling parameters
-class NormConv2d(nn.Module):
-    def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0):
-        super().__init__()
-        self.beta = nn.Parameter(torch.zeros([1, out_channels, 1, 1], dtype=torch.float32))
-        self.gamma = nn.Parameter(torch.ones([1, out_channels, 1, 1], dtype=torch.float32))
-        self.conv = nn.utils.weight_norm(
-            nn.Conv2d(in_channels, out_channels, kernel_size, stride, padding),
-            name="weight",
-        )
 
-    def forward(self, x):
-        # weight normalization
-        # self.conv.weight = normalize(self.conv.weight., dim=[0, 2, 3])
-        out = self.conv(x)
-        out = self.gamma * out + self.beta
-        return out
-
-
-class Downsample(nn.Module):
-    def __init__(self, channels, out_channels=None, conv_layer=NormConv2d):
-        super().__init__()
-        if out_channels is None:
-            self.down = conv_layer(channels, channels, kernel_size=3, stride=2, padding=1)
-        else:
-            self.down = conv_layer(channels, out_channels, kernel_size=3, stride=2, padding=1)
-
-    def forward(self, x):
-        return self.down(x)
-
-
-class Upsample(nn.Module):
-    def __init__(self, in_channels, out_channels, subpixel=True, conv_layer=NormConv2d):
-        super().__init__()
-        if subpixel:
-            self.up = conv_layer(in_channels, 4 * out_channels, 3, padding=1)
-            self.op2 = DepthToSpace(block_size=2)
-        else:
-            # channels have to be bisected because of formely concatenated skips connections
-            self.up = nn.ConvTranspose2d(in_channels, out_channels, kernel_size=3, stride=2, padding=1)
-            self.op2 = IDAct()
-
-    def forward(self, x):
-        out = self.up(x)
-        out = self.op2(out)
-        return out
 
 
