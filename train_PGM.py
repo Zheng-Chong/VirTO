@@ -43,7 +43,7 @@ def train(model_name='default', epoch_num=500, save_frequency=100, patch_size=12
         G.load_state_dict(torch.load(G_dir, map_location=device)['model_state_dict'])
     G.to(device)
     # Setup Optimizer
-    optimizer_g =  torch.optim.Adam(G.parameters())
+    optimizer_g = torch.optim.Adam(G.parameters())
 
     # Train for epochs
     for epoch in range(start_epoch, start_epoch + epoch_num):
