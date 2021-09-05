@@ -16,7 +16,7 @@ out = open("PGM_training_log.txt", 'w')
 ''' 
     Hyper-parameter
 '''
-batch_size = 16
+batch_size = 8
 patch_size = 64
 epoch_num = 1000
 weight_adv, weight_l1, weight_per, weight_BDR = 1, 1, 2, 0.2

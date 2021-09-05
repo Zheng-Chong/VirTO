@@ -90,9 +90,6 @@ class ResnetBlock(nn.Module):
             else nn.Conv2d(in_channels, out_channels, kernel_size=1)
 
     def forward(self, x):
-        a = self.block(x)
-        b = self.resConnection(x)
-        # print(a.size(), b.size())
         out = self.block(x) + self.resConnection(x) if self.skip else self.block(x)
         return out
 
