@@ -42,7 +42,7 @@ class PGMDataset(Dataset):
         self.images = []
         img_list = os.listdir(self.seg_dir)
         for img in img_list:
-            if img.rfind("person") != -1:
+            if img.rfind("_vis") == -1 && img.endswith(".png"):
                 self.images.append(img)
 
         print("Dataset Usable Pairs:", len(self.images))
