@@ -16,7 +16,7 @@ out = open("PGM_training_log.txt", 'w')
 ''' 
     Hyper-parameter
 '''
-batch_size = 8
+batch_size = 4
 patch_size = 64
 epoch_num = 1000
 weight_adv, weight_l1, weight_per, weight_BDR = 1, 1, 2, 0.2
@@ -26,7 +26,7 @@ weight_adv, weight_l1, weight_per, weight_BDR = 1, 1, 2, 0.2
 '''
 model_name = "PGM-XCeption-1.0"  # The name to tore checkpoint
 save_frequency = 50  # The number of intervals between storage of checkpoints
-continue_training = True  # Whether to find & use pre-training checkpoint
+continue_training = False  # Whether to find & use pre-training checkpoint
 
 root_dir = '/home/lingfeimo/cz/Dataset/adidas/men/t_shirt'  # Path to preprocessed dataset
 # root_dir = '/Users/fredrichie/Desktop/dataset/adidas_pre/men/test'
@@ -35,7 +35,7 @@ G_dir = './checkpoints/%s.pth' % model_name  # Path to pre-trained Generator che
 
 def train(model_name='default', epoch_num=500, save_frequency=100, patch_size=128, visualize=True, continue_training=True):
     # Initial dataset
-    dataset = dataset_loader.PGMDataset(root_dir)
+    dataset = dataset_loader.PGMDataset(root_dir, resize=128)
     # Setup Cloth Parsing Module Network
     G, start_epoch = networks.PGMGenerator(), 0
     if os.path.isfile(G_dir) and continue_training:
@@ -48,6 +48,7 @@ def train(model_name='default', epoch_num=500, save_frequency=100, patch_size=12
 
     # Train for epochs
     for epoch in range(start_epoch, start_epoch + epoch_num):
+        print(epoch)
 
         train_data = DataLoader(dataset, batch_size=batch_size, shuffle=True)  # Load dataset
         G.train()  # switch to train mode
