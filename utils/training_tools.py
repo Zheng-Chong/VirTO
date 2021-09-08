@@ -11,11 +11,13 @@ def save_model(epoch, model, optimizer, name):
     # print("Model state saved to ./checkpoints/%s.pth !" % name)
 
 
-def set_requires_grad(net, requires_grad=False):
-    if net is not None:
-        for param in net.parameters():
-            param.requires_grad = requires_grad
-
+def set_requires_grad(net1, net2):
+    if net1 is not None:
+        for param in net1.parameters():
+            param.requires_grad = True
+    if net2 is not None:
+        for param in net2.parameters():
+            param.requires_grad = False
 
 def record_time():
     if torch.cuda.is_available():
@@ -23,12 +25,17 @@ def record_time():
     return time.time()
 
 
-def training_log(epoch, batch, time, losses, freq):
+def training_log(epoch, batch, time, losses, freq, lr=None, txt_log=None):
     info = 'Epoch %3i Batch %4i, time: %3f s ' % (epoch, batch, time)
     for key in losses.keys():
         info += ', %s:%4f' % (key, losses[key]/freq)
         losses[key] = 0
+    if lr is not None:
+        info += " ,lr=%f6" % lr
     print(info)
+    if txt_log is not None:
+        with open("test.txt", "a") as f:
+            f.write(info)
 
 
 def visualize(imgs, name, dir):

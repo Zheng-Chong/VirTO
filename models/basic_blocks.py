@@ -35,14 +35,14 @@ class CBAM(nn.Module):
 
 # Depth-wise Separable Convolution
 class SeparableConv(nn.Module):
-    def __init__(self, in_ch, out_ch):
+    def __init__(self, in_ch, out_ch, kernel_size=3, padding=1):
         super(SeparableConv, self).__init__()
         self.depth_conv = nn.Conv2d(
             in_channels=in_ch,
             out_channels=in_ch,
-            kernel_size=3,
+            kernel_size=kernel_size,
             stride=1,
-            padding=1,
+            padding=padding,
             groups=in_ch
         )
         self.point_conv = nn.Conv2d(
@@ -60,32 +60,30 @@ class SeparableConv(nn.Module):
         return out
 
 
-# Basic Block for ResNet based Network
-class ResnetBlock(nn.Module):
-    def __init__(self, in_channels, out_channels, conv_num=3, separable_conv=False, cbam=False,
-                 pre_relu=True, max_pool=False, diy=None, skip=True, upsanmple=False):
-        super(ResnetBlock, self).__init__()
+# Basic Block for Xception Network
+class XceptionBlock(nn.Module):
+    def __init__(self, in_channels, out_channels, conv_num=3, conv=SeparableConv, cbam=False, pre_relu=False,
+                 max_pool=False, skip=False, diy=None):
+        super(XceptionBlock, self).__init__()
         self.skip = skip
+        if diy is None:
+            in_cs, out_cs = [in_channels] + [out_channels] * (conv_num - 1), [out_channels] * conv_num
+        else:
+            in_cs, out_cs = [in_channels] + diy[:-1], diy
+
         blocks = []
-        in_cs = [in_channels] + [out_channels] * (conv_num-1) if diy is None else diy
-        for i in in_cs:
-            conv_layer = SeparableConv(i, out_channels) if separable_conv else nn.Conv2d(i, out_channels, kernel_size=3, padding=1)
+        for i in range(conv_num):
             blocks += [nn.ReLU(),
-                       conv_layer,
-                       nn.BatchNorm2d(out_channels)]
+                       conv(in_cs[i], out_cs[i], 3, 1),
+                       nn.BatchNorm2d(out_cs[i])]
         if not pre_relu:
             blocks.pop(0)
         if max_pool:
             blocks += [nn.MaxPool2d(kernel_size=3, stride=2, padding=1)]
         if cbam:
             blocks += [CBAM(out_channels)]
-        if upsanmple:
-            blocks += [nn.ReLU(),
-                       nn.ConvTranspose2d(out_channels, out_channels // 2, kernel_size=2, stride=2),
-                       nn.BatchNorm2d(out_channels // 2)
-                       ]
-
         self.block = nn.Sequential(*blocks).to(device)
+
         # Resident Connections
         self.resConnection = nn.Conv2d(in_channels, out_channels, kernel_size=1, stride=2) if max_pool \
             else nn.Conv2d(in_channels, out_channels, kernel_size=1)
@@ -95,6 +93,28 @@ class ResnetBlock(nn.Module):
         return out
 
 
+# Basic Block for U-Net based Network
+class UNetBlock(nn.Module):
+    def __init__(self, in_channels, out_channels, conv=nn.Conv2d, max_pool=False, cbam=False, upsample=False):
+        super(UNetBlock, self).__init__()
+        blocks = []
+        if max_pool:
+            blocks += [nn.MaxPool2d(kernel_size=2, stride=2)]
+        blocks += [conv(in_channels, out_channels, 3, 1),
+                   nn.BatchNorm2d(out_channels),
+                   nn.ReLU(),
+                   conv(out_channels, out_channels, 3, 1),
+                   nn.BatchNorm2d(out_channels),
+                   nn.ReLU(),
+                   ]
+        if cbam:
+            blocks += [CBAM(out_channels)]
+        if upsample:
+            blocks += [nn.ConvTranspose2d(out_channels, out_channels // 2, kernel_size=2, stride=2),
+                       nn.BatchNorm2d(out_channels // 2),
+                       nn.ReLU()
+                       ]
+        self.blocks = nn.Sequential(*blocks).to(device)
 
-
-
+    def forward(self, x):
+        return self.blocks(x)
