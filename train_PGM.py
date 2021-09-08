@@ -28,8 +28,8 @@ model_name = "PGM-XUNet-1.0"  # The name to tore checkpoint
 save_frequency = 25  # The number of intervals between storage of checkpoints
 continue_training = True  # Whether to find & use pre-training checkpoint
 
-root_dir = '/home/lingfeimo/cz/Dataset/adidas/men/t_shirt'  # Path to preprocessed dataset
-# root_dir = '/Users/fredrichie/Desktop/dataset/adidas_pre/men/test'
+# root_dir = '/home/lingfeimo/cz/Dataset/adidas/men/t_shirt'  # Path to preprocessed dataset
+root_dir = '/Users/fredrichie/Desktop/dataset/adidas_pre/men/test'
 G_dir = './checkpoints/%s.pth' % model_name  # Path to pre-trained Generator checkpoint
 
 
@@ -55,7 +55,7 @@ def train(model_name='default', epoch_num=500, save_frequency=100, resize=256, p
 
         train_data = DataLoader(dataset, batch_size=batch_size, shuffle=True)  # Load dataset
         G.train()  # switch to train mode
-        loss_record = {'CE': 0, 'Adv': 0, 'Dis': 0}
+        loss_record = {'S-L1': 0, 'Adv': 0, 'Dis': 0}
 
         for i_batch, batch_data in enumerate(train_data):
             groud_truth, iuv, cloth_mask = batch_data[0].to(device), batch_data[1].to(device), \
@@ -68,7 +68,7 @@ def train(model_name='default', epoch_num=500, save_frequency=100, resize=256, p
 
             # Calculate Losses
             adv_criterion = networks.AdversarialLoss(lsgan=True)
-            bce_loss = nn.CrossEntropyLoss()(pred_seg, groud_truth)
+            bce_loss = nn.SmoothL1Loss()(pred_seg, groud_truth)
             gen_loss = adv_criterion(pred_seg, D, patch_size, True)
             dis_loss = adv_criterion(pred_seg, D, patch_size, False, groud_truth)
 
