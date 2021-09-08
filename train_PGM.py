@@ -15,7 +15,7 @@ out = "PGM_training_log.txt"
 ''' 
     Hyper-parameter
 '''
-batch_size = 8
+batch_size = 4
 patch_size = 32
 resize = 256
 epoch_num = 100
