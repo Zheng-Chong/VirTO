@@ -5,7 +5,7 @@ from . import basic_blocks as bb
 
 # An Encoder net based on U-Net structure
 class UNetEncoder(nn.Module):
-    def __init__(self, in_channels):
+    def __init__(self, in_channels, cbam=False):
         super(UNetEncoder, self).__init__()
         self.down_blocks = [bb.UNetBlock(in_channels, 64)]  # 64 X 512 X 512
         self.down_blocks += [bb.UNetBlock(64, 128, conv=bb.SeparableConv, max_pool=True)]  # 128 X 256 X 256
@@ -24,7 +24,7 @@ class UNetEncoder(nn.Module):
 
 # An Encoder net based on Xception structure
 class Xception(nn.Module):
-    def __init__(self, in_channels, out_channels=2048, GAP=None, cbam=True):
+    def __init__(self, in_channels, GAP=None, cbam=False):
         super(Xception, self).__init__()
 
         self.entry = nn.Sequential(

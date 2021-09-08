@@ -1,4 +1,5 @@
 from . import functional_unit as fu
+from . import basic_blocks as bb
 import torch.nn as nn
 import torch
 
@@ -7,12 +8,12 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Generator of PGM
 class PGMGenerator(nn.Module):
-    def __init__(self, in_channels=1, out_channels=1, code_channels=2048):
+    def __init__(self, in_channels=1, out_channels=1, cbam=False):
         super(PGMGenerator, self).__init__()
-        self.cloth_enc = fu.Xception(in_channels)
-        self.iuv_enc = fu.UNetEncoder(in_channels)
+        self.cloth_enc = fu.Xception(in_channels, cbam=cbam)
+        self.iuv_enc = fu.UNetEncoder(in_channels, cbam=cbam)
         
-        self.dec = fu.UNetDecoder(512 * 2 + 128, out_channels)
+        self.dec = fu.UNetDecoder(512 * 2 + 128, out_channels, conv=bb.SeparableConv, cbam=cbam)
 
     def forward(self, iuv, cloth_mask):
         c = self.cloth_enc(cloth_mask)
@@ -49,9 +50,9 @@ class Discriminator(nn.Module):
 
 # Adversarial Loss based on PatchGAN
 class AdversarialLoss(nn.Module):
-    def __init__(self):
+    def __init__(self, lsgan=False):
         super(AdversarialLoss, self).__init__()
-        self.loss = nn.BCELoss()
+        self.loss = nn.MSELoss() if lsgan else nn.BCEWithLogitsLoss()
         return
 
     def forward(self, pred, discriminator, patch_size, is_adv, target=None):

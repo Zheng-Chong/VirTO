@@ -31,7 +31,7 @@ def training_log(epoch, batch, time, losses, freq, lr=None, txt_log=None):
         info += ', %s:%4f' % (key, losses[key]/freq)
         losses[key] = 0
     if lr is not None:
-        info += " ,lr=%f6" % lr
+        info += ", lr=%f6" % lr
     print(info)
     if txt_log is not None:
         with open("test.txt", "a") as f:
