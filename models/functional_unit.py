@@ -11,7 +11,7 @@ class UNetEncoder(nn.Module):
         self.down_blocks += [bb.UNetBlock(64, 128, conv=bb.SeparableConv, max_pool=True)]  # 128 X 256 X 256
         self.down_blocks += [bb.UNetBlock(128, 256, conv=bb.SeparableConv, max_pool=True)]  # 256 X 128 X 128
         self.down_blocks += [bb.UNetBlock(256, 512, conv=bb.SeparableConv, max_pool=True)]  # 512 X 64 X 64
-        self.exit = bb.UNetBlock(512, 1024, conv=bb.SeparableConv, max_pool=True, upsample=True)  # 512 X 32 X 32
+        self.exit = bb.UNetBlock(512, 1024, conv=bb.SeparableConv, max_pool=True, upsample=True)  # 512 X 64 X 64
 
     def forward(self, x):
         skip_res = []
@@ -71,6 +71,6 @@ class UNetDecoder(nn.Module):
     def forward(self, x, skip_x):
         middle_res = x
         for i in range(4):
-            middle_res = torch.cat((middle_res, skip_x[i]), 1)
+            middle_res = torch.cat((middle_res, skip_x[3-i]), 1)
             middle_res = self.ups[i](middle_res)
         return self.exit(middle_res)

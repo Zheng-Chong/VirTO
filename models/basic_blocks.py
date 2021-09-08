@@ -100,10 +100,10 @@ class UNetBlock(nn.Module):
         blocks = []
         if max_pool:
             blocks += [nn.MaxPool2d(kernel_size=2, stride=2)]
-        blocks += [conv(in_channels, out_channels, 3, 1),
+        blocks += [conv(in_channels, out_channels, 3, padding=1),
                    nn.BatchNorm2d(out_channels),
                    nn.ReLU(),
-                   conv(out_channels, out_channels, 3, 1),
+                   conv(out_channels, out_channels, 3, padding=1),
                    nn.BatchNorm2d(out_channels),
                    nn.ReLU(),
                    ]

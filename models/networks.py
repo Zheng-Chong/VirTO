@@ -12,11 +12,13 @@ class PGMGenerator(nn.Module):
         self.cloth_enc = fu.Xception(in_channels)
         self.iuv_enc = fu.UNetEncoder(in_channels)
         
-        self.dec = fu.UNetDecoder(512 * 3, out_channels)
+        self.dec = fu.UNetDecoder(512 * 2 + 128, out_channels)
 
     def forward(self, iuv, cloth_mask):
-        code = torch.cat((self.iuv_enc(iuv), self.cloth_enc(cloth_mask)), 1)
-        return self.dec(code)
+        c = self.cloth_enc(cloth_mask)
+        i, skip = self.iuv_enc(iuv)
+        code = torch.cat((i, c), 1)
+        return self.dec(code, skip)
 
 
 # Discriminator Network
