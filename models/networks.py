@@ -15,7 +15,7 @@ class PGMGenerator(nn.Module):
         self.dec = fu.UNetDecoder(512 * 3, out_channels)
 
     def forward(self, iuv, cloth_mask):
-        code = torch.cat((self.shape_enc(iuv), self.shape_enc(cloth_mask)), 1)
+        code = torch.cat((self.iuv_enc(iuv), self.cloth_enc(cloth_mask)), 1)
         return self.dec(code)
 
 
