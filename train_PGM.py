@@ -24,20 +24,24 @@ weight_adv, weight_l1, weight_per, weight_BDR = 1, 1.5, 2, 0.2
 ''' 
     Training parameters
 '''
-model_name = "PGM-XUNet-1.0"  # The name to tore checkpoint
-save_frequency = 25  # The number of intervals between storage of checkpoints
+model_name = "PGM-XUNet-1.1"  # The name to tore checkpoint
+save_frequency = 1  # The number of intervals between storage of checkpoints
 continue_training = True  # Whether to find & use pre-training checkpoint
 
-root_dir = '/home/lingfeimo/cz/Dataset/adidas/men/t_shirt'  # Path to preprocessed dataset
-# root_dir = '/Users/fredrichie/Desktop/dataset/adidas_pre/men/test'
+# root_dir = '/home/lingfeimo/cz/Dataset/adidas/men'  # Path to preprocessed dataset
+# cloth_type = ['t_shirt', 'coat', 'vest']
+
+root_dir = '/Users/fredrichie/Desktop/dataset/adidas_pre/men'
+cloth_type = ['test']
+
 G_dir = './checkpoints/%s.pth' % model_name  # Path to pre-trained Generator checkpoint
 
 
 def train(model_name='default', epoch_num=500, save_frequency=100, resize=256, patch_size=128, visualize=True, continue_training=True):
     # Initial dataset
-    dataset = dataset_loader.PGMDataset(root_dir, resize=resize)
+    dataset = dataset_loader.PGMDataset(root_dir, cloth_type, resize=resize)
     # Setup Cloth Parsing Module Network
-    G, D = networks.PGMGenerator(), networks.Discriminator(resize)
+    G, D = networks.PGMGenerator(in_channels=1, out_channels=5), networks.Discriminator(5)
     start_epoch = 0
     if os.path.isfile(G_dir) and continue_training:
         print("Load state dict from %s ...." % G_dir)

@@ -36,16 +36,18 @@ def visualize_tensor(tensor, name, dst):
 
 
 # Divide Different Mask Area Into Different Channels
-def extract_masks(tensor, mask_values):
+def extract_masks(tensor, mask_values, merge=False):
     channels = []
     for v in mask_values:
         v = v/255
+        color = v if merge else 1
         channel = tensor.clone()
         channel = channel.masked_fill(mask=channel != v, value=torch.tensor(0))
-        channels.append(channel.masked_fill(mask=channel == v, value=torch.tensor(v)))
+        channels.append(channel.masked_fill(mask=channel == v, value=torch.tensor(color)))
     res = torch.stack(channels, 0)
-
-    return res.sum(0)
+    if merge:
+        res = res.sum(0).unsqueeze(0)
+    return res
 
 
 def splice_image(images, grayscales=False):
@@ -67,6 +69,8 @@ def select_value(image, value):
     mask = image != value
     image = image.masked_fill(mask=mask, value=torch.tensor(0))
     return image
+
+
 # target_img = PIL.Image.open("/Users/fredrichie/PycharmProjects/MyTryOn2.0/test_iuv.png")
 # target_img = trans(target_img)[2]
 # target_img = extract_masks(target_img, list(range(1, 25)))

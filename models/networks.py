@@ -25,10 +25,10 @@ class PGMGenerator(nn.Module):
 # Discriminator Network
 # 3 down-sampling to extract features -> fc layer to judge true and false
 class Discriminator(nn.Module):
-    def __init__(self, img_size):
+    def __init__(self, in_channels):
         super(Discriminator, self).__init__()
         self.enc = nn.Sequential(
-            nn.Conv2d(1, 16, 3, padding=1),  # 32 X 32
+            nn.Conv2d(in_channels, 16, 3, padding=1),  # 32 X 32
             nn.LeakyReLU(inplace=True),
             nn.MaxPool2d(3, 2),   # 16 X 16
             nn.Conv2d(16, 64, 3, padding=1),
