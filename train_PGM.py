@@ -106,7 +106,7 @@ def train(model_name='default', epoch_num=500, save_frequency=100, resize=256, p
             if (i_batch + 1) % save_frequency == 0:
                 # Visualization
                 if visualize:
-                    training_tools.visualize([cloth_mask[0][0], iuv[0][0], groud_truth[0][0], pred_seg[0][0]],
+                    training_tools.visualize([cloth_mask[0], iuv[0], groud_truth[0], pred_seg[0]],
                                              '%s-e%i-b%i' % (model_name, epoch, i_batch+1), "./visualization")
                 # Save checkpoint
                 training_tools.save_model(epoch, G, optimizer_g, model_name)

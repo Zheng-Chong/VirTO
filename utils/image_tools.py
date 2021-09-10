@@ -21,18 +21,19 @@ def save_image(img, name, dst):
     # print('Save Image to %s' % save_path)
 
 
-# Divide Multi-channel Image Tensor & Output As One Long Image
-def visualize_tensor(tensor, name, dst):
-    long_img = tensor
+# Auto-grayscale tensor
+def grayscale_tensor(tensor):
     if len(list(tensor.size())) == 3:
-        tensor_list = []
-        for i in tensor:
-            tensor_list.append(i)
-        long_img = torch.cat(tensor_list, 1)
-    elif len(list(tensor.size())) != 2:
-        print("ERROR: only tensor in 2 or 3 dimensions can be visualized!")
+        cs = []
+        for index, i in enumerate(tensor):
+            channel = i.clone()
+            channel = channel.masked_fill(mask=channel != 0, value=torch.tensor((index+1)/tensor.size(0)))
+            cs.append(channel)
+        res = torch.stack(cs, 0).sum(0).unsqueeze(0)
+        return res
+    else:
+        print("ERROR: only tensor in 3 dimensions can be visualized!")
         return
-    save_image(long_img, name, dst)
 
 
 # Divide Different Mask Area Into Different Channels

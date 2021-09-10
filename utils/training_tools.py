@@ -39,6 +39,8 @@ def training_log(epoch, batch, time, losses, freq, lr=None, txt_log=None):
 
 
 def visualize(imgs, name, dir):
-    grayscales = False if imgs[0].size(0) == 3 else True
-    result = image_tools.splice_image(imgs, grayscales=grayscales)
+    vis = []
+    for i in imgs:
+        vis.append(image_tools.grayscale_tensor(i))
+    result = torch.cat(vis, 2)
     image_tools.save_image(result, name, dir)
