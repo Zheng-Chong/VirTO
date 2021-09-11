@@ -28,23 +28,21 @@ class Discriminator(nn.Module):
     def __init__(self, in_channels):
         super(Discriminator, self).__init__()
         self.enc = nn.Sequential(
-            nn.Conv2d(in_channels, 16, 3, padding=1),  # 32 X 32
+            nn.Conv2d(in_channels, 16 * in_channels, 3, padding=1, groups=in_channels),  # 16 X 32 X 32
+            nn.MaxPool2d(3, 2, padding=1),   # 16 X 16 X 16
             nn.LeakyReLU(inplace=True),
-            nn.MaxPool2d(3, 2),   # 16 X 16
-            nn.Conv2d(16, 64, 3, padding=1),
-            nn.MaxPool2d(3, 2),   # 8 X 8
+            nn.Conv2d(16 * in_channels, 64 * in_channels, 3, padding=1),  # 64 X 16 X 16
+            nn.MaxPool2d(3, 2, padding=1),   # 64 X 8 X 8
             nn.LeakyReLU(inplace=True),
-            nn.Conv2d(64, 128, 3, padding=1),
-            nn.AdaptiveMaxPool2d((1, 1))
+            nn.Conv2d(64 * in_channels, 128 * in_channels, 3, padding=1),  # 128 X 8 X 8
+            nn.AdaptiveMaxPool2d((1, 1)),  # 128 X 1 X 1
+            nn.Conv2d(128 * in_channels, in_channels, 1, groups=in_channels)  # 1 X 1 X 1
         )
-        self.fc = nn.Sequential(
-            nn.Linear(128, 1),
-            nn.Sigmoid()
-        )
+        self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
         f = self.enc(x)
-        res = self.fc(f.view(f.size(0), -1))
+        res = self.sigmoid(f.view(f.size(0), f.size(1), -1))
         return res
 
 
@@ -57,8 +55,8 @@ class AdversarialLoss(nn.Module):
 
     def forward(self, pred, discriminator, patch_size, is_adv, target=None):
         loss = 0
-        valid = torch.ones(pred.size(0), 1).to(device)
-        zeros = torch.zeros(pred.size(0), 1).to(device)
+        valid = torch.ones(pred.size(0), pred.size(1), 1).to(device)
+        zeros = torch.zeros(pred.size(0), pred.size(1), 1).to(device)
         row = int(pred.size(2) / patch_size)
         col = int(pred.size(3) / patch_size)
         for a in range(row):
@@ -76,6 +74,5 @@ class AdversarialLoss(nn.Module):
                     continue
                 patch_real = target[:, :, x:x + patch_size, y:y + patch_size]
                 pred_real = discriminator(patch_real)
-                loss += torch.div(self.loss(pred_real, valid), 2) + \
-                        torch.div(self.loss(pred_fake, zeros), 2)
+                loss += torch.div(self.loss(pred_real, valid), 2) + torch.div(self.loss(pred_fake, zeros), 2)
         return loss / (row * col)
