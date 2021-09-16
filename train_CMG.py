@@ -17,7 +17,7 @@ out = "CMG_training_log.txt"
 ''' 
     Hyper-parameter
 '''
-batch_size = 4
+batch_size = 8
 patch_size = 32
 resize = 256
 epoch_num = 100

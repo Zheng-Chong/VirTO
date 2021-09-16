@@ -2,6 +2,7 @@ import torch
 import time
 from utils import image_tools
 
+
 def save_model(epoch, model, optimizer, name):
     torch.save({
             'epoch': epoch,
@@ -18,6 +19,7 @@ def set_requires_grad(net1, net2):
     if net2 is not None:
         for param in net2.parameters():
             param.requires_grad = False
+
 
 def record_time():
     if torch.cuda.is_available():
