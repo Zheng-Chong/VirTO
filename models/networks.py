@@ -50,20 +50,17 @@ class Discriminator(nn.Module):
             nn.AdaptiveMaxPool2d((1, 1)),  # 128 X 1 X 1
             nn.Conv2d(128 * in_channels, in_channels, 1, groups=in_channels)  # 1 X 1 X 1
         )
-        self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
         f = self.enc(x)
-        res = self.sigmoid(f.view(f.size(0), f.size(1), -1))
-        return res
+        return f.view(f.size(0), f.size(1), -1)
 
 
 # Adversarial Loss based on PatchGAN
 class AdversarialLoss(nn.Module):
     def __init__(self, lsgan=False):
         super(AdversarialLoss, self).__init__()
-        self.loss = nn.MSELoss() if lsgan else nn.BCEWithLogitsLoss()
-        return
+        self.loss = nn.MSELoss() if lsgan else nn.BCELoss()
 
     def forward(self, pred, discriminator, patch_size, is_adv, target=None):
         loss = 0

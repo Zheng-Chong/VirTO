@@ -19,6 +19,7 @@ batch_size = 4
 patch_size = 32
 resize = 256
 epoch_num = 100
+clip_max_norm = 5
 weight_adv, weight_l1, weight_per, weight_BDR = 1, 1.5, 2, 0.2
 
 ''' 
@@ -50,8 +51,8 @@ def train(model_name='default', epoch_num=500, save_frequency=100, resize=256, p
     G.to(device)
     D.to(device)
     # Setup Optimizer
-    optimizer_g = torch.optim.Adam(G.parameters(), lr=0.06)
-    optimizer_d = torch.optim.Adam(D.parameters(), lr=0.01)
+    optimizer_g = torch.optim.RMSprop(G.parameters(), lr=0.06)
+    optimizer_d = torch.optim.RMSprop(D.parameters(), lr=0.01)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer_g, T_0=5, T_mult=2)
 
     # Train for epochs
@@ -94,8 +95,9 @@ def train(model_name='default', epoch_num=500, save_frequency=100, resize=256, p
             training_tools.set_requires_grad(D, None)
             D.zero_grad()
             loss_d.backward()
-
             optimizer_g.step()
+            # Clipping Gradient
+            nn.utils.clip_grad_norm_(D.parameters(), max_norm=clip_max_norm, norm_type=2)
             optimizer_d.step()
 
             # Record End Time
