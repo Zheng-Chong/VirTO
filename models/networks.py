@@ -6,6 +6,18 @@ import torch
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
+# Cloth Mask Generator
+class CMGenerator(nn.Module):
+    def __init__(self, in_channels=1, out_channels=1, cbam=False):
+        super(CMGenerator, self).__init__()
+        self.enc = fu.UNetEncoder(in_channels, cbam=cbam)
+        self.dec = fu.UNetDecoder(512*2, out_channels, conv=bb.SeparableConv, cbam=cbam)
+
+    def forward(self, cloth_img):
+        i, skip = self.enc(cloth_img)
+        return self.dec(i, skip)
+
+
 # Generator of PGM
 class PGMGenerator(nn.Module):
     def __init__(self, in_channels=1, out_channels=1, cbam=False):

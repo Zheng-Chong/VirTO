@@ -27,7 +27,7 @@ def trans(img, resize=512, interp=PIL.Image.NEAREST):
     return transformer(img)
 
 
-# Dataset for training Parsing Generate Module)
+# Dataset for training Parsing Generate Module
 class PGMDataset(Dataset):
     def __init__(self, root_dir, cloth_type, resize=256):
         self.resize = resize
@@ -62,6 +62,38 @@ class PGMDataset(Dataset):
         upper_seg = image_tools.extract_masks(trans(target_seg, resize=self.resize).view(self.resize, -1), [5, 7, 10, 14, 15])
 
         return upper_seg, iuv, cloth_mask
+
+
+# Dataset for training Cloth Mask Generator
+class CMGDataset(Dataset):
+    def __init__(self, root_dir, cloth_type, resize=256):
+        self.resize = resize
+        self.images = []
+        for c in cloth_type:
+            path = os.path.join(root_dir, c, 'cloth')
+            for img in os.listdir(path):
+                if img.endswith("-cloth_front.jpg"):
+                    self.images.append(os.path.join(path, img))
+        print("[CMG] Dataset Usable Pairs:", len(self.images))
+
+    def __len__(self):
+        return len(self.images)
+
+    def __getitem__(self, index):
+        file = self.images[index]
+        # prefix: dir to cloth type
+        # name: image name without postfix
+        prefix, name = file[:file.rfind('/')-6], file[file.rfind('/')+1:]
+        #   1. cloth masks (./cloth-mask/*-cloth_front.jpg)
+        #   2. cloth image (./cloth/*-cloth_front.jpg)
+        target_cloth_img = PIL.Image.open(file)
+        target_cloth_mask = PIL.Image.open(os.path.join(prefix, "cloth-mask", name))
+
+        # Process and Integration data
+        cloth_img = trans(target_cloth_img, resize=self.resize)
+        cloth_mask = trans(target_cloth_mask, resize=self.resize)
+
+        return cloth_img, cloth_mask
 
 # from torch.utils.data import DataLoader
 # root_dir = '/Users/fredrichie/Desktop/dataset/adidas_pre/men_t_shirt_pre'  # Path to preprocessed dataset
