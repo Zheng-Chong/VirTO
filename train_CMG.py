@@ -17,9 +17,9 @@ out = "CMG_training_log.txt"
 ''' 
     Hyper-parameter
 '''
-batch_size = 8
-patch_size = 32
-resize = 256
+batch_size = 4
+patch_size = 64
+resize = 512
 epoch_num = 100
 clip_max_norm = 5
 weight_adv, weight_l1, weight_per, weight_BDR = 1, 1.5, 2, 0.2
