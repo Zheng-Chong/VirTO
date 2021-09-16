@@ -27,7 +27,7 @@ weight_adv, weight_l1, weight_per, weight_BDR = 1, 1.5, 2, 0.2
 ''' 
     Training parameters
 '''
-model_name = "CMG-UNet-1.0.0"  # The name to tore checkpoint
+model_name = "CMG-UNet-1.0.1"  # The name to tore checkpoint
 save_frequency = 10  # The number of intervals between storage of checkpoints
 continue_training = True  # Whether to find & use pre-training checkpoint
 
