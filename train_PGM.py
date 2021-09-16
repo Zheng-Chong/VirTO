@@ -26,7 +26,7 @@ weight_adv, weight_l1, weight_per, weight_BDR = 1, 1.5, 2, 0.2
     Training parameters
 '''
 model_name = "PGM-XUNet-1.1.2"  # The name to tore checkpoint
-save_frequency = 1  # The number of intervals between storage of checkpoints
+save_frequency = 20  # The number of intervals between storage of checkpoints
 continue_training = True  # Whether to find & use pre-training checkpoint
 
 root_dir = '/home/lingfeimo/cz/Dataset/adidas/men'  # Path to preprocessed dataset
