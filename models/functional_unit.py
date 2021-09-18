@@ -66,7 +66,9 @@ class UNetDecoder(nn.Module):
                     bb.UNetBlock(256, 128, conv, cbam=cbam, upsample=True),
                     bb.UNetBlock(128, 64, conv, cbam=cbam)
                     ]
-        self.exit = nn.Conv2d(64, out_channels, kernel_size=1)
+        self.exit = nn.Sequential(nn.Conv2d(64, out_channels, kernel_size=1),
+                                  nn.ReLU()
+                                  )
 
     def forward(self, x, skip_x):
         middle_res = x

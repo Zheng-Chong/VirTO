@@ -16,7 +16,7 @@ class CMGenerator(nn.Module):
 
     def forward(self, cloth_img):
         i, skip = self.enc(cloth_img)
-        return self.relu(self.dec(i, skip))
+        return self.dec(i, skip)
 
 
 # Generator of PGM
