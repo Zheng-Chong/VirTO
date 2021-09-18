@@ -27,7 +27,7 @@ def grayscale_tensor(tensor):
         cs = []
         for index, i in enumerate(tensor):
             channel = i.clone()
-            channel = channel.masked_fill(mask=channel != 0, value=torch.tensor((index+1)/tensor.size(0)))
+            channel = channel.masked_fill(mask=channel > 0, value=torch.tensor((index+1)/tensor.size(0)))
             cs.append(channel)
         res = torch.stack(cs, 0).sum(0).unsqueeze(0)
         return res

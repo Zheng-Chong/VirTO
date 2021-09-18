@@ -12,10 +12,11 @@ class CMGenerator(nn.Module):
         super(CMGenerator, self).__init__()
         self.enc = fu.UNetEncoder(in_channels, cbam=cbam)
         self.dec = fu.UNetDecoder(512*2, out_channels, conv=bb.SeparableConv, cbam=cbam)
+        self.relu = nn.ReLU()
 
     def forward(self, cloth_img):
         i, skip = self.enc(cloth_img)
-        return self.dec(i, skip)
+        return self.relu(self.dec(i, skip))
 
 
 # Generator of PGM

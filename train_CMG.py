@@ -17,9 +17,9 @@ out = "CMG_training_log.txt"
 ''' 
     Hyper-parameter
 '''
-batch_size = 4
+batch_size = 8
 patch_size = 64
-resize = 512
+resize = 256
 epoch_num = 100
 clip_max_norm = 5
 weight_adv, weight_l1, weight_per, weight_BDR = 1, 1.5, 2, 0.2
@@ -27,8 +27,8 @@ weight_adv, weight_l1, weight_per, weight_BDR = 1, 1.5, 2, 0.2
 ''' 
     Training parameters
 '''
-model_name = "CMG-UNet-1.0.1"  # The name to tore checkpoint
-save_frequency = 10  # The number of intervals between storage of checkpoints
+model_name = "CMG-UNet-1.0.2"  # The name to tore checkpoint
+save_frequency = 20  # The number of intervals between storage of checkpoints
 continue_training = True  # Whether to find & use pre-training checkpoint
 
 root_dir = '/home/lingfeimo/cz/Dataset/adidas/men'  # Path to preprocessed dataset
