@@ -75,7 +75,7 @@ def train(model_name='default', epoch_num=500, save_frequency=100, resize=256, p
             pred_seg = G(cloth_img)
             # Calculate Losses
             adv_criterion = networks.AdversarialLoss(lsgan=True)
-            bce_loss = nn.SmoothL1Loss()(pred_seg, groud_truth)
+            bce_loss = nn.L1Loss(pred_seg, groud_truth)
             gen_loss = adv_criterion(pred_seg, D, patch_size, True)
             dis_loss = adv_criterion(pred_seg, D, patch_size, False, groud_truth)
 
