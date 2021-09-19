@@ -18,16 +18,16 @@ out = "CMG_training_log.txt"
     Hyper-parameter
 '''
 batch_size = 8
-patch_size = 64
+patch_size = 128
 resize = 256
 epoch_num = 100
-clip_max_norm = 5
+clip_max_norm = 10
 weight_adv, weight_l1, weight_per, weight_BDR = 1, 1.5, 2, 0.2
 
 ''' 
     Training parameters
 '''
-model_name = "CMG-UNet-1.0.2"  # The name to tore checkpoint
+model_name = "CMG-UNet-1.0.3"  # The name to tore checkpoint
 save_frequency = 20  # The number of intervals between storage of checkpoints
 continue_training = True  # Whether to find & use pre-training checkpoint
 
