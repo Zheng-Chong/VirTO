@@ -21,8 +21,8 @@ batch_size = 8
 patch_size = 128
 resize = 256
 epoch_num = 100
-clip_max_norm = 10
-weight_adv, weight_l1, weight_per, weight_BDR = 1, 1.5, 2, 0.2
+clip_max_norm = 3
+weight_adv, weight_l1, weight_per, weight_BDR = 1, 3, 2, 0.2
 
 ''' 
     Training parameters
@@ -56,7 +56,7 @@ def train(model_name='default', epoch_num=500, save_frequency=100, resize=256, p
     G.to(device)
     D.to(device)
     # Setup Optimizer
-    optimizer_g = torch.optim.RMSprop(G.parameters(), lr=0.06)
+    optimizer_g = torch.optim.RMSprop(G.parameters(), lr=0.05)
     optimizer_d = torch.optim.RMSprop(D.parameters(), lr=0.01)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer_g, T_0=5, T_mult=2)
 
