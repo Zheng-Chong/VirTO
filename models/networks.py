@@ -12,7 +12,6 @@ class CMGenerator(nn.Module):
         super(CMGenerator, self).__init__()
         self.enc = fu.UNetEncoder(in_channels, cbam=cbam)
         self.dec = fu.UNetDecoder(512*2, out_channels, conv=bb.SeparableConv, cbam=cbam)
-        self.relu = nn.ReLU()
 
     def forward(self, cloth_img):
         i, skip = self.enc(cloth_img)
@@ -25,7 +24,6 @@ class PGMGenerator(nn.Module):
         super(PGMGenerator, self).__init__()
         self.cloth_enc = fu.Xception(in_channels, cbam=cbam)
         self.iuv_enc = fu.UNetEncoder(in_channels, cbam=cbam)
-        
         self.dec = fu.UNetDecoder(512 * 2 + 128, out_channels, conv=bb.SeparableConv, cbam=cbam)
 
     def forward(self, iuv, cloth_mask):

@@ -73,6 +73,8 @@ def train(model_name='default', epoch_num=500, save_frequency=100, resize=256, p
             start = training_tools.record_time()
             # Generate fake result
             pred_seg = G(cloth_img)
+            for i in pred_seg[0]:
+                print(i)
             # Calculate Losses
             adv_criterion = networks.AdversarialLoss(lsgan=True)
             bce_loss = nn.SmoothL1Loss()(pred_seg, groud_truth)
